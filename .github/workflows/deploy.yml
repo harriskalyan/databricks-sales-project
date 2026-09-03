@@ -10,24 +10,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      # 1. Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2. Install Databricks CLI
       - name: Install Databricks CLI
         uses: databricks/setup-cli@main
 
+      # 3. Validate Databricks Bundle
       - name: Validate Bundle
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
           DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
         run: |
-          databricks bundle validate
+          databricks bundle validate -t dev
 
+      # 4. Deploy Databricks Bundle
       - name: Deploy Bundle
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
           DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
         run: |
-          databricks bundle run job
+          databricks bundle deploy -t dev
+
+      # 5. Run Databricks Job
+      - name: Run Databricks Job
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+          DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+        run: |
+          databricks bundle run sales_job -t dev
